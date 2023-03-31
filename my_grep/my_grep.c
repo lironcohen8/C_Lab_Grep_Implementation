@@ -2,18 +2,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define EXPECTED_NUM_OF_ARGS 3
+#define PATTERN_ARG_NUM 1
+#define FILE_ARG_NUM 2
+
 int main(int argc, char const *argv[])
 {
-    if (argc != 3) {
+    if (argc != EXPECTED_NUM_OF_ARGS) {
         printf("Wrong number of arguments\n");
         exit(EXIT_FAILURE);
     }
 
-    char const * pattern = argv[1];
-    FILE* file = fopen(argv[2], "r");
+    char const * pattern = argv[PATTERN_ARG_NUM];
+    FILE* file = fopen(argv[FILE_ARG_NUM], "r");
 
     if (file == NULL) {
-        printf("Error opening file %s\n", argv[2]);
+        printf("Error opening file %s\n", argv[FILE_ARG_NUM]);
         exit(EXIT_FAILURE);
     }
 
