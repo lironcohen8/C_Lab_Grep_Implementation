@@ -19,16 +19,15 @@ int main(int argc, char const *argv[])
 
     char* line_buffer = NULL;
     size_t len = 0;
-    ssize_t chars_read_in_line = 0;
 
-    while ((chars_read_in_line = getline(&line_buffer, &len, file)) != -1) {
+    while ((getline(&line_buffer, &len, file)) != -1) {
         if (strstr(line_buffer, pattern) != NULL) {
             printf("%s", line_buffer);
         }
     }
 
     fclose(file);
-    if (line_buffer) {
+    if (line_buffer != NULL) {
         free(line_buffer);
     }
 
