@@ -13,10 +13,10 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
-    char const * pattern = argv[PATTERN_ARG_NUM];
-    FILE* file = fopen(argv[FILE_ARG_NUM], "r");
+    char const * search_pattern = argv[PATTERN_ARG_NUM];
+    FILE* input_file = fopen(argv[FILE_ARG_NUM], "r");
 
-    if (file == NULL) {
+    if (input_file == NULL) {
         printf("Error opening file %s\n", argv[FILE_ARG_NUM]);
         exit(EXIT_FAILURE);
     }
@@ -24,13 +24,13 @@ int main(int argc, char const *argv[])
     char* line_buffer = NULL;
     size_t len = 0;
 
-    while ((getline(&line_buffer, &len, file)) != -1) {
-        if (strstr(line_buffer, pattern) != NULL) {
+    while ((getline(&line_buffer, &len, input_file)) != -1) {
+        if (strstr(line_buffer, search_pattern) != NULL) {
             printf("%s", line_buffer);
         }
     }
 
-    fclose(file);
+    fclose(input_file);
     if (line_buffer != NULL) {
         free(line_buffer);
     }
