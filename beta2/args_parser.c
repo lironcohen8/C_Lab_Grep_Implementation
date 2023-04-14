@@ -1,6 +1,8 @@
 #include "args_parser.h"
-#include "stdlib.h"
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <stdio.h>
 
 #define LINES_AFTER_MATCH_FLAG 'A'
 #define LINE_OFFSET_FLAG       'b'
@@ -52,43 +54,47 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
     return num_args_processed;
 }
 
-/* public functions*/
-void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
-    char const* curr_arg = NULL;
-    unsigned int args_processed_in_iteration = 0;
-    int i = 1;
-
-    for (; i < argc - 1;) {
-        curr_arg = argv[i];
-        if (ARG_IS_FLAG(curr_arg)) {
-            args_processed_in_iteration = args_parser_update_flags(arguments, ARG_GET_FLAG(curr_arg), argv[i+1]);
-        } else {
-            arguments->search_pattern = curr_arg;
-            args_processed_in_iteration = 1;
-        }
-
-        if (args_processed_in_iteration == 0) {
-            exit(EXIT_FAILURE);
-        }
-        i += args_processed_in_iteration;
-    }
-
-    if (i == argc - 1 && !ARG_IS_FLAG(argv[i])) {
-        if (arguments->regex_pattern == NULL && arguments->search_pattern == NULL) {
-            arguments->search_pattern = argv[i];
-            arguments->input_stream = stdin;
-        } else {
-            arguments->input_stream = fopen(argv[i], "r");
-            if (arguments->input_stream == NULL) {
-                printf("failed to open file %s\n", argv[i]);
-                exit(EXIT_FAILURE);
-            }
-        }
+int process_arg(char const* curr_arg, char const* optional_value, arguments_t* arguments) {
+    if (ARG_IS_FLAG(curr_arg)) {
+        return args_parser_update_flags(arguments, ARG_GET_FLAG(curr_arg), optional_value);
     } else {
-        arguments->input_stream = stdin;
+        arguments->search_pattern = curr_arg;
+        return 1;
     }
 }
 
-void init_arguments(arguments_t* arguments) {
+void process_last_arg(char const* last_arg, arguments_t* arguments) {
+    if (ARG_IS_FLAG(last_arg)) {
+        process_arg(last_arg, NULL, arguments);
+    } else {
+        if (arguments->regex_pattern == NULL && arguments->search_pattern == NULL) {
+            arguments->search_pattern = last_arg;
+        } else {
+            arguments->input_filename = last_arg;
+        }
+    }
+}
+
+/* public functions*/
+void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     memset(arguments, 0x00, sizeof(arguments_t));
+    char const* curr_arg = NULL, *optional_val = NULL;
+    unsigned int args_processed_in_iteration = 0;
+    int argv_index = 1;
+
+    for (; argv_index < argc - 1 ; ) {
+        curr_arg = argv[argv_index];
+        optional_val = argv[argv_index+1];
+        args_processed_in_iteration = process_arg(curr_arg, optional_val, arguments);
+        if (args_processed_in_iteration == 0) {
+            exit(EXIT_FAILURE);
+        }
+         argv_index+= args_processed_in_iteration;
+    }
+
+    if (argv_index == argc - 1) {
+        process_last_arg(argv[argv_index], arguments);
+    }
+
+    assert(arguments->regex_pattern != NULL || arguments->search_pattern != NULL);
 }
