@@ -1,4 +1,19 @@
 #include "line_scanner.h"
+#include <string.h>
+
+bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
+    // TODO : a lot here ...
+    if (strstr(line->line_buffer, arguments->search_pattern) != NULL) {
+        return true;
+    }
+    
+    return false;
+}
+
+bool should_print_line(input_line_t* line, arguments_t* arguments) {
+    return (line->is_match && !arguments->print_non_match) ||
+            (!line->is_match && arguments->print_non_match);
+}
 
 int read_line(input_scanner_t* input_scanner, input_line_t* line) {
     line->offset = input_scanner->current_offset;

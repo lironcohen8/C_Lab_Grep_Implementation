@@ -12,7 +12,9 @@ typedef struct {
     bool is_match;
 } input_line_t;
 
+bool is_match_in_line(input_line_t* line, arguments_t* arguments);
+bool should_print_line(input_line_t* line, arguments_t* arguments);
 int read_line(input_scanner_t* input_scanner, input_line_t* line);
-void print_line(input_line_t* line, arguments_t* argument, unsigned int line_number);
+void print_line(input_line_t* line, arguments_t* arguments, unsigned int line_number);
 
 #endif

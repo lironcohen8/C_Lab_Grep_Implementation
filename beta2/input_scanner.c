@@ -18,20 +18,23 @@ FILE* get_input_stream(char const* input_filename) {
 }
 
 void scan_input(arguments_t* arguments) {
-    input_scanner_t input_scanner;
+    input_scanner_t input_scanner = {.current_offset = 0, .input_stream = NULL};
     input_scanner.input_stream = get_input_stream(arguments->input_filename);
     input_line_t current_line = {.is_match = false, .line_buffer=NULL, .offset=0};
     unsigned int current_line_num = 1;
 
     while ((read_line(&input_scanner, &current_line)) != -1) {
-        print_line(&current_line, arguments, current_line_num);
+        current_line.is_match = is_match_in_line(&current_line, arguments);
+        if (should_print_line(&current_line, arguments)) {
+            print_line(&current_line, arguments, current_line_num);
+        }
         current_line_num++;
     }
 
-    if (arguments->input_filename != NULL) {
-        fclose(input_scanner.input_stream);
-    }
     if (current_line.line_buffer != NULL) {
         free(current_line.line_buffer);
+    }
+    if (arguments->input_filename != NULL) {
+        fclose(input_scanner.input_stream);
     }
 }
