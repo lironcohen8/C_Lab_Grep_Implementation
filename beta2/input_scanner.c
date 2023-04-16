@@ -18,7 +18,7 @@ FILE* get_input_stream(char const* input_filename) {
 }
 
 void scan_input(arguments_t* arguments) {
-    input_scanner_t input_scanner = {.current_offset = 0, .input_stream = NULL};
+    input_scanner_t input_scanner = {.current_offset = 0, .input_stream = NULL, .buff_len = 0};
     input_scanner.input_stream = get_input_stream(arguments->input_filename);
     input_line_t current_line = {.is_match = false, .line_buffer=NULL, .offset=0};
     unsigned int current_line_num = 1;

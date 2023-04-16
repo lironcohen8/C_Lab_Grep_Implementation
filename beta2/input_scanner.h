@@ -7,6 +7,7 @@
 typedef struct {
     FILE* input_stream;
     unsigned int current_offset;
+    size_t buff_len;
 } input_scanner_t;
 
 void scan_input(arguments_t* arguments);

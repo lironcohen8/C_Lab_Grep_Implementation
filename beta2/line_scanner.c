@@ -17,9 +17,8 @@ bool should_print_line(input_line_t* line, arguments_t* arguments) {
 
 int read_line(input_scanner_t* input_scanner, input_line_t* line) {
     line->offset = input_scanner->current_offset;
-    size_t len = 0;
     ssize_t res = 0;
-    res = getline(&line->line_buffer, &len, input_scanner->input_stream);
+    res = getline(&line->line_buffer, &input_scanner->buff_len, input_scanner->input_stream);
     if (res >= 0) {
         input_scanner->current_offset += res;
     }
