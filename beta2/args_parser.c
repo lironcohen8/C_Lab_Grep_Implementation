@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #define LINES_AFTER_MATCH_FLAG 'A'
 #define LINE_OFFSET_FLAG       'b'
@@ -76,6 +77,12 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
 }
 
 /* public functions*/
+void lowercase_string(char *string_to_lowercase) {
+    for (int i = 0; string_to_lowercase[i]; i++){
+        string_to_lowercase[i] = tolower(string_to_lowercase[i]);
+    }
+}
+
 void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     memset(arguments, 0x00, sizeof(arguments_t));
     char const* curr_arg = NULL, *optional_val = NULL;
@@ -94,6 +101,15 @@ void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
 
     if (argv_index == argc - 1) {
         process_last_arg(argv[argv_index], arguments);
+    }
+
+    if (arguments->ignore_case) {
+        if (arguments->search_pattern != NULL) {
+            lowercase_string(arguments->search_pattern);
+        }
+        if (arguments->regex_pattern != NULL) {
+            lowercase_string(arguments->regex_pattern);
+        }
     }
 
     assert(arguments->regex_pattern != NULL || arguments->search_pattern != NULL);

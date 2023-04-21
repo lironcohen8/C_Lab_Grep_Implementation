@@ -22,13 +22,21 @@ void scan_input(arguments_t* arguments) {
     input_scanner.input_stream = get_input_stream(arguments->input_filename);
     input_line_t current_line = {.is_match = false, .line_buffer=NULL, .offset=0};
     unsigned int current_line_num = 1;
+    unsigned int number_of_matched_lines = 0;
 
     while ((read_line(&input_scanner, &current_line)) != -1) {
         current_line.is_match = is_match_in_line(&current_line, arguments);
         if (should_print_line(&current_line, arguments)) {
-            print_line(&current_line, arguments, current_line_num);
+            if (!arguments->print_count_lines) {
+                print_line(&current_line, arguments, current_line_num);
+            }
+            number_of_matched_lines++;
         }
         current_line_num++;
+    }
+
+    if (arguments->print_count_lines) {
+        printf("%d\n", number_of_matched_lines);
     }
 
     if (current_line.line_buffer != NULL) {

@@ -1,15 +1,28 @@
 #include "line_scanner.h"
+#include "args_parser.h"
 #include <string.h>
 
+bool is_regex_match_in_line(input_line_t* line, arguments_t* arguments) {
+    return false;
+    // TODO complete
+}
+
 bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
-    // TODO : a lot here ...
-    // if ignore case : move all to lower case (line and pattern)
-    // if regex : regex handling
-    // else: if -x : strict (strcmp)
+    if (arguments->ignore_case) {
+        lowercase_string(line->line_buffer);
+    }
+    if (arguments->regex_pattern != NULL) {
+        return is_regex_match_in_line(line, arguments);
+    }
+    if (arguments->line_strict_match) {
+        if (strcmp(line->line_buffer, arguments->search_pattern) == 0) {
+            return true;
+        }
+        return false;
+    }
     if (strstr(line->line_buffer, arguments->search_pattern) != NULL) {
         return true;
     }
-    
     return false;
 }
 
@@ -37,3 +50,4 @@ void print_line(input_line_t* line, arguments_t* arguments, unsigned int line_nu
     }
     printf("%s", line->line_buffer);
 }
+
