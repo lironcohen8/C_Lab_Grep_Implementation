@@ -3,6 +3,9 @@
 
 bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
     // TODO : a lot here ...
+    // if ignore case : move all to lower case (line and pattern)
+    // if regex : regex handling
+    // else: if -x : strict (strcmp)
     if (strstr(line->line_buffer, arguments->search_pattern) != NULL) {
         return true;
     }
