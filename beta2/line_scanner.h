@@ -6,8 +6,9 @@
 #include "args_parser.h"
 #include "input_scanner.h"
 
-typedef struct {
+typedef struct _input_line_t {
     char* line_buffer;
+    char* line_in_lowercase;
     unsigned int offset;
     bool is_match;
 } input_line_t;

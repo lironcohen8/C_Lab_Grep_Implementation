@@ -39,6 +39,9 @@ void scan_input(arguments_t* arguments) {
         printf("%d\n", number_of_matched_lines);
     }
 
+    if (current_line.line_in_lowercase != NULL) {
+        free(current_line.line_in_lowercase);
+    }
     if (current_line.line_buffer != NULL) {
         free(current_line.line_buffer);
     }

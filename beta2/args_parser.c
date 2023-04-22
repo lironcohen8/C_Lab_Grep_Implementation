@@ -44,7 +44,7 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
             arguments->line_strict_match = true;
             break;
         case REGEX_PRESENT_FLAG:
-            arguments->regex_pattern = optionl_value;
+            arguments->regex_pattern->pattern = optionl_value;
             num_args_processed++;
             break;
         default:
@@ -59,7 +59,7 @@ int process_arg(char const* curr_arg, char const* optional_value, arguments_t* a
     if (ARG_IS_FLAG(curr_arg)) {
         return args_parser_update_flags(arguments, ARG_GET_FLAG(curr_arg), optional_value);
     } else {
-        arguments->search_pattern = curr_arg;
+        arguments->search_pattern->pattern = curr_arg;
         return 1;
     }
 }
@@ -68,8 +68,8 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
     if (ARG_IS_FLAG(last_arg)) {
         process_arg(last_arg, NULL, arguments);
     } else {
-        if (arguments->regex_pattern == NULL && arguments->search_pattern == NULL) {
-            arguments->search_pattern = last_arg;
+        if (arguments->regex_pattern->pattern == NULL && arguments->search_pattern->pattern == NULL) {
+            arguments->search_pattern->pattern = last_arg;
         } else {
             arguments->input_filename = last_arg;
         }
@@ -77,26 +77,27 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
 }
 
 /* public functions*/
-void lowercase_string(char *string_to_lowercase) {
-    for (int i = 0; string_to_lowercase[i]; i++){
-        string_to_lowercase[i] = tolower(string_to_lowercase[i]);
+void lowercase_string(char const *original_string, char *lowercased_string) {
+    (char *) realloc (lowercased_string, strlen(original_string));
+    for (int i = 0; original_string[i]; i++){
+        lowercased_string[i] = tolower(original_string[i]);
     }
 }
 
 void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     memset(arguments, 0x00, sizeof(arguments_t));
     char const* curr_arg = NULL, *optional_val = NULL;
-    unsigned int args_processed_in_iteration = 0;
+    unsigned int count_args_processed_in_iteration = 0;
     int argv_index = 1;
 
     for (; argv_index < argc - 1 ; ) {
         curr_arg = argv[argv_index];
         optional_val = argv[argv_index+1];
-        args_processed_in_iteration = process_arg(curr_arg, optional_val, arguments);
-        if (args_processed_in_iteration == 0) {
+        count_args_processed_in_iteration = process_arg(curr_arg, optional_val, arguments);
+        if (count_args_processed_in_iteration == 0) {
             exit(EXIT_FAILURE);
         }
-         argv_index+= args_processed_in_iteration;
+         argv_index += count_args_processed_in_iteration;
     }
 
     if (argv_index == argc - 1) {
@@ -104,13 +105,13 @@ void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     }
 
     if (arguments->ignore_case) {
-        if (arguments->search_pattern != NULL) {
-            lowercase_string(arguments->search_pattern);
+        if (arguments->search_pattern->pattern != NULL) {
+            lowercase_string(arguments->search_pattern->pattern, arguments->search_pattern->pattern_in_lowercase);
         }
-        if (arguments->regex_pattern != NULL) {
-            lowercase_string(arguments->regex_pattern);
+        if (arguments->regex_pattern->pattern != NULL) {
+            lowercase_string(arguments->regex_pattern->pattern, arguments->regex_pattern->pattern_in_lowercase);
         }
     }
 
-    assert(arguments->regex_pattern != NULL || arguments->search_pattern != NULL);
+    assert(arguments->regex_pattern->pattern != NULL || arguments->search_pattern->pattern != NULL);
 }

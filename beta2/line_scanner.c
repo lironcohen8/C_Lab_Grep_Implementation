@@ -8,19 +8,23 @@ bool is_regex_match_in_line(input_line_t* line, arguments_t* arguments) {
 }
 
 bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
+    char * line_to_check = line->line_buffer;
+    char * pattern_to_check = arguments->search_pattern->pattern;
     if (arguments->ignore_case) {
-        lowercase_string(line->line_buffer);
+        lowercase_string(line->line_buffer, line->line_in_lowercase);
+        line_to_check = line->line_in_lowercase;
+        pattern_to_check = arguments->search_pattern->pattern_in_lowercase;
     }
-    if (arguments->regex_pattern != NULL) {
+    if (arguments->regex_pattern->pattern != NULL) {
         return is_regex_match_in_line(line, arguments);
     }
     if (arguments->line_strict_match) {
-        if (strcmp(line->line_buffer, arguments->search_pattern) == 0) {
+        if (strcmp(line_to_check, pattern_to_check) == 0) {
             return true;
         }
         return false;
     }
-    if (strstr(line->line_buffer, arguments->search_pattern) != NULL) {
+    if (strstr(line_to_check, pattern_to_check) != NULL) {
         return true;
     }
     return false;
