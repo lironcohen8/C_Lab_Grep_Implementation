@@ -11,7 +11,7 @@ execute_test() {
     "./$PROG_NAME" $1 | diff $OUTFILE -
 
     valgrind --quiet --leak-check=yes "./$PROG_NAME" $1 | diff $OUTFILE -
-    #echo "test$2 completed"
+    echo "test$2 completed"
 }
 
 execute_test "arg -n -b main.c" 1
