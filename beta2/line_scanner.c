@@ -43,10 +43,10 @@ int read_line(input_scanner_t* input_scanner, input_line_t* line) {
 
 void print_line(input_line_t* line, arguments_t* arguments, unsigned int line_number){
     if (arguments->print_line_number) {
-        printf("%u%s", line_number, line->is_match ? ":" : "-");
+        printf("%u%s", line_number, should_print_line(line, arguments) ? ":" : "-");
     }
     if (arguments->print_line_offset) {
-        printf("%u%s", line->offset, line->is_match ? ":" : "-");
+        printf("%u%s", line->offset, should_print_line(line, arguments) ? ":" : "-");
     }
     printf("%s", line->line_buffer);
 }
