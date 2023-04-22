@@ -44,7 +44,7 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
             arguments->line_strict_match = true;
             break;
         case REGEX_PRESENT_FLAG:
-            arguments->regex_pattern->pattern = optionl_value;
+            arguments->regex_pattern = optionl_value;
             num_args_processed++;
             break;
         default:
@@ -59,7 +59,7 @@ int process_arg(char const* curr_arg, char const* optional_value, arguments_t* a
     if (ARG_IS_FLAG(curr_arg)) {
         return args_parser_update_flags(arguments, ARG_GET_FLAG(curr_arg), optional_value);
     } else {
-        arguments->search_pattern->pattern = curr_arg;
+        arguments->search_pattern = curr_arg;
         return 1;
     }
 }
@@ -68,8 +68,8 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
     if (ARG_IS_FLAG(last_arg)) {
         process_arg(last_arg, NULL, arguments);
     } else {
-        if (arguments->regex_pattern->pattern == NULL && arguments->search_pattern->pattern == NULL) {
-            arguments->search_pattern->pattern = last_arg;
+        if (arguments->regex_pattern == NULL && arguments->search_pattern == NULL) {
+            arguments->search_pattern = last_arg;
         } else {
             arguments->input_filename = last_arg;
         }
@@ -78,7 +78,6 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
 
 /* public functions*/
 void lowercase_string(char const *original_string, char *lowercased_string) {
-    (char *) realloc (lowercased_string, strlen(original_string));
     for (int i = 0; original_string[i]; i++){
         lowercased_string[i] = tolower(original_string[i]);
     }
@@ -105,13 +104,13 @@ void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     }
 
     if (arguments->ignore_case) {
-        if (arguments->search_pattern->pattern != NULL) {
-            lowercase_string(arguments->search_pattern->pattern, arguments->search_pattern->pattern_in_lowercase);
+        if (arguments->search_pattern != NULL) {
+            lowercase_string(arguments->search_pattern, arguments->search_pattern);
         }
-        if (arguments->regex_pattern->pattern != NULL) {
-            lowercase_string(arguments->regex_pattern->pattern, arguments->regex_pattern->pattern_in_lowercase);
+        if (arguments->regex_pattern != NULL) {
+            lowercase_string(arguments->regex_pattern, arguments->regex_pattern);
         }
     }
 
-    assert(arguments->regex_pattern->pattern != NULL || arguments->search_pattern->pattern != NULL);
+    assert(arguments->regex_pattern != NULL || arguments->search_pattern != NULL);
 }

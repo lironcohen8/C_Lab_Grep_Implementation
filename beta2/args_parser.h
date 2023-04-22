@@ -3,11 +3,6 @@
 
 #include <stdbool.h>
 
-typedef struct _pattern_t {
-    char const* pattern;
-    char * pattern_in_lowercase;
-} pattern_t;
-
 typedef struct _arguments_t {
     unsigned int num_lines_after_match;
     bool         print_line_offset;
@@ -16,9 +11,9 @@ typedef struct _arguments_t {
     bool         print_line_number;
     bool         print_non_match;
     bool         line_strict_match;
-    pattern_t*   regex_pattern;
-    pattern_t*   search_pattern;
+    char *       regex_pattern;
     char const*  input_filename;
+    char *       search_pattern;
 } arguments_t;
 
 
