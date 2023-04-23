@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #define LINES_AFTER_MATCH_FLAG 'A'
 #define LINE_OFFSET_FLAG       'b'
@@ -16,7 +17,7 @@
 #define ARG_IS_FLAG(arg)      (arg[0] == '-')
 #define ARG_GET_FLAG(arg)     (arg[1])
 
-/* private functions*/
+/* private functions */
 unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char const* optionl_value) {
     unsigned int num_args_processed = 1;
     switch (flag) {
@@ -75,25 +76,41 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
     }
 }
 
-/* public functions*/
+/* public functions */
+void lowercase_string(char const* original_string, char* lowercased_string) {
+    for (int i = 0; i < strlen(original_string); i++){
+        lowercased_string[i] = tolower(original_string[i]);
+    }
+    lowercased_string[strlen(lowercased_string)] = '\0';
+}
+
 void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     memset(arguments, 0x00, sizeof(arguments_t));
     char const* curr_arg = NULL, *optional_val = NULL;
-    unsigned int args_processed_in_iteration = 0;
+    unsigned int count_args_processed_in_iteration = 0;
     int argv_index = 1;
 
     for (; argv_index < argc - 1 ; ) {
         curr_arg = argv[argv_index];
         optional_val = argv[argv_index+1];
-        args_processed_in_iteration = process_arg(curr_arg, optional_val, arguments);
-        if (args_processed_in_iteration == 0) {
+        count_args_processed_in_iteration = process_arg(curr_arg, optional_val, arguments);
+        if (count_args_processed_in_iteration == 0) {
             exit(EXIT_FAILURE);
         }
-         argv_index+= args_processed_in_iteration;
+         argv_index += count_args_processed_in_iteration;
     }
 
     if (argv_index == argc - 1) {
         process_last_arg(argv[argv_index], arguments);
+    }
+
+    if (arguments->ignore_case) {
+        if (arguments->search_pattern != NULL) {
+            lowercase_string(arguments->search_pattern, arguments->search_pattern);
+        }
+        if (arguments->regex_pattern != NULL) {
+            lowercase_string(arguments->regex_pattern, arguments->regex_pattern);
+        }
     }
 
     assert(arguments->regex_pattern != NULL || arguments->search_pattern != NULL);
