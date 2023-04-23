@@ -13,8 +13,7 @@ typedef struct _input_line_t {
 } input_line_t;
 
 bool is_match_in_line(input_line_t* line, arguments_t* arguments);
-bool should_use_line(input_line_t* line, arguments_t* arguments);
-bool should_print_line(arguments_t* arguments);
+bool should_print_line(arguments_t* arguments, bool has_found_match_yet, unsigned int current_line_num, unsigned int last_matched_line_num);
 int read_line(input_scanner_t* input_scanner, input_line_t* line);
 void print_line(input_line_t* line, arguments_t* arguments, unsigned int line_number);
 

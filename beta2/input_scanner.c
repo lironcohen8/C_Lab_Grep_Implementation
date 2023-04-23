@@ -22,15 +22,19 @@ void scan_input(arguments_t* arguments) {
     input_scanner.input_stream = get_input_stream(arguments->input_filename);
     input_line_t current_line = {.is_match = false, .line_buffer=NULL, .offset=0};
     unsigned int current_line_num = 1;
+    bool has_found_match_yet = false;
+    unsigned int last_matched_line_num = 0;
     unsigned int number_of_matched_lines = 0;
 
     while ((read_line(&input_scanner, &current_line)) != -1) {
         current_line.is_match = is_match_in_line(&current_line, arguments);
-        if (should_use_line(&current_line, arguments)) {
-            if (should_print_line(arguments)) {
-                print_line(&current_line, arguments, current_line_num);
-            }
+        if (current_line.is_match) {
+            has_found_match_yet = true;
+            last_matched_line_num = current_line_num;
             number_of_matched_lines++;
+        }
+        if (should_print_line(arguments, has_found_match_yet, current_line_num, last_matched_line_num)) {
+            print_line(&current_line, arguments, current_line_num);
         }
         current_line_num++;
     }

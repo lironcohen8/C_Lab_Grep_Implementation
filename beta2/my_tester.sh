@@ -38,6 +38,9 @@ execute_test "ARG -x -n -v main.c" 21
 execute_test "{ -x -v main.c" 22
 execute_test "{ -x -c -v main.c" 23
 execute_test "{ -x -n -v main.c" 24
+execute_test "ARG -x -n -A 2 main.c" 25
+execute_test "{ -x -A 1 main.c" 26
+execute_test "ARG -i -x -A 2 -c main.c" 27
 
 # regex tests
 # ./regex_test1.sh

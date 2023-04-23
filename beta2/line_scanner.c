@@ -34,16 +34,13 @@ bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
     if (lowercase_string_buffer != NULL) {
         free(lowercase_string_buffer);
     }
-    return is_match;
+    return (is_match && !arguments->print_non_match) ||
+           (!is_match && arguments->print_non_match);
 }
 
-bool should_print_line(arguments_t* arguments) {
-    return !arguments->print_count_lines;
-}
-
-bool should_use_line(input_line_t* line, arguments_t* arguments) {
-    return (line->is_match && !arguments->print_non_match) ||
-            (!line->is_match && arguments->print_non_match);
+bool should_print_line(arguments_t* arguments, bool has_found_match_yet, unsigned int current_line_num, unsigned int last_matched_line_num) {
+    return !arguments->print_count_lines &&
+           (has_found_match_yet && current_line_num - last_matched_line_num <= arguments->num_lines_after_match);
 }
 
 int read_line(input_scanner_t* input_scanner, input_line_t* line) {
@@ -62,10 +59,10 @@ int read_line(input_scanner_t* input_scanner, input_line_t* line) {
 
 void print_line(input_line_t* line, arguments_t* arguments, unsigned int line_number){
     if (arguments->print_line_number) {
-        printf("%u%s", line_number, should_use_line(line, arguments) ? ":" : "-");
+        printf("%u%s", line_number, line->is_match ? ":" : "-");
     }
     if (arguments->print_line_offset) {
-        printf("%u%s", line->offset, should_use_line(line, arguments) ? ":" : "-");
+        printf("%u%s", line->offset, line->is_match ? ":" : "-");
     }
     printf("%s\n", line->line_buffer);
 }
