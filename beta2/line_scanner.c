@@ -11,8 +11,8 @@ bool is_regex_match_in_line(input_line_t* line, arguments_t* arguments) {
 
 bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
     bool is_match = false;
-    char * line_to_check = line->line_buffer;
-    char * lowercase_string_buffer = NULL;
+    char* line_to_check = line->line_buffer;
+    char* lowercase_string_buffer = NULL;
 
     if (arguments->ignore_case) {
         lowercase_string_buffer = (char *) malloc (strlen(line->line_buffer) + 1);
