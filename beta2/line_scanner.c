@@ -24,16 +24,21 @@ bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
     if (arguments->regex_pattern != NULL) {
         is_match = is_regex_match_in_line(line, arguments);
     }
-    else if (arguments->line_strict_match && strcmp(line_to_check, arguments->search_pattern) == 0) {
-        is_match = true;
+    else if (arguments->line_strict_match) {
+        is_match = strcmp(line_to_check, arguments->search_pattern) == 0;
     }
-    else if (strstr(line_to_check, arguments->search_pattern) != NULL) {
-        is_match = true;
+    else {
+        is_match = strstr(line_to_check, arguments->search_pattern) != NULL;
     }
+    
     if (lowercase_string_buffer != NULL) {
         free(lowercase_string_buffer);
     }
     return is_match;
+}
+
+bool should_print_line(arguments_t* arguments) {
+    return !arguments->print_count_lines;
 }
 
 bool should_use_line(input_line_t* line, arguments_t* arguments) {
@@ -62,9 +67,6 @@ void print_line(input_line_t* line, arguments_t* arguments, unsigned int line_nu
     if (arguments->print_line_offset) {
         printf("%u%s", line->offset, should_use_line(line, arguments) ? ":" : "-");
     }
-    printf("%s", line->line_buffer);
-    if (strstr(line->line_buffer, "\n") == NULL) {
-        printf("\n");
-    }
+    printf("%s\n", line->line_buffer);
 }
 

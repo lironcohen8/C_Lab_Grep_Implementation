@@ -77,7 +77,7 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
 }
 
 /* public functions */
-void lowercase_string(char const *original_string, char *lowercased_string) {
+void lowercase_string(char const* original_string, char* lowercased_string) {
     for (int i = 0; i <= strlen(original_string); i++){
         lowercased_string[i] = tolower(original_string[i]);
     }

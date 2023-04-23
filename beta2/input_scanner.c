@@ -27,7 +27,7 @@ void scan_input(arguments_t* arguments) {
     while ((read_line(&input_scanner, &current_line)) != -1) {
         current_line.is_match = is_match_in_line(&current_line, arguments);
         if (should_use_line(&current_line, arguments)) {
-            if (!arguments->print_count_lines) {
+            if (should_print_line(arguments)) {
                 print_line(&current_line, arguments, current_line_num);
             }
             number_of_matched_lines++;
