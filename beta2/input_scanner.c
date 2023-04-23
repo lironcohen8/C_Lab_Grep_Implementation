@@ -22,7 +22,7 @@ void scan_input(arguments_t* arguments) {
     input_scanner.input_stream = get_input_stream(arguments->input_filename);
     input_line_t current_line = {.is_match = false, .line_buffer=NULL, .offset=0};
     unsigned int current_line_num = 1;
-    bool has_found_match_yet = false;
+    bool has_found_match_yet = false; // This variable is for preventing false positive print matches
     unsigned int last_matched_line_num = 0;
     unsigned int number_of_matched_lines = 0;
 
