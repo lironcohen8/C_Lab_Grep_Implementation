@@ -17,7 +17,7 @@
 #define ARG_IS_FLAG(arg)      (arg[0] == '-')
 #define ARG_GET_FLAG(arg)     (arg[1])
 
-/* private functions*/
+/* private functions */
 unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char const* optionl_value) {
     unsigned int num_args_processed = 1;
     switch (flag) {
@@ -76,9 +76,9 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
     }
 }
 
-/* public functions*/
+/* public functions */
 void lowercase_string(char const *original_string, char *lowercased_string) {
-    for (int i = 0; original_string[i]; i++){
+    for (int i = 0; i <= strlen(original_string); i++){
         lowercased_string[i] = tolower(original_string[i]);
     }
 }
