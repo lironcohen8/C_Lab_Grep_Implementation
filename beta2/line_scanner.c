@@ -30,7 +30,7 @@ bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
     else {
         is_match = strstr(line_to_check, arguments->search_pattern) != NULL;
     }
-    
+
     if (lowercase_string_buffer != NULL) {
         free(lowercase_string_buffer);
     }
@@ -52,10 +52,10 @@ int read_line(input_scanner_t* input_scanner, input_line_t* line) {
     res = getline(&line->line_buffer, &input_scanner->buff_len, input_scanner->input_stream);
     if (res >= 0) {
         input_scanner->current_offset += res;
-    }
-    int line_length = strlen(line->line_buffer);
-    if (line_length > 0 && line->line_buffer[line_length - 1] == '\n') {
-        line->line_buffer[line_length - 1] = '\0';
+        int line_length = strlen(line->line_buffer);
+        if (line_length > 0 && line->line_buffer[line_length - 1] == '\n') {
+            line->line_buffer[line_length - 1] = '\0';
+        }
     }
     return res;
 }
