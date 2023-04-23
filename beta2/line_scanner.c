@@ -1,13 +1,10 @@
 #include "line_scanner.h"
 #include "args_parser.h"
+#include "regex_parser.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 
-bool is_regex_match_in_line(input_line_t* line, arguments_t* arguments) {
-    return false;
-    // TODO complete
-}
 
 bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
     bool is_match = false;
@@ -22,7 +19,7 @@ bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
     }
 
     if (arguments->regex_pattern != NULL) {
-        is_match = is_regex_match_in_line(line, arguments);
+        is_match = is_regex_match_in_line(line_to_check, arguments->regex_pattern);
     }
     else if (arguments->line_strict_match) {
         is_match = strcmp(line_to_check, arguments->search_pattern) == 0;

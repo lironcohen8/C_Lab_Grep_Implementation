@@ -21,4 +21,6 @@ void lowercase_string(char const *original_string, char *lowercased_string);
 
 void parse_arguments(int argc, char const *argv[], arguments_t* arguments);
 
+void free_args_internals(arguments_t* arguments);
+
 #endif

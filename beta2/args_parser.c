@@ -18,6 +18,12 @@
 #define ARG_GET_FLAG(arg)     (arg[1])
 
 /* private functions */
+void alloc_str_and_copy(char** dest, char const* source) {
+    *dest = (char*) malloc(strlen(source) + 1);
+    assert(*dest != NULL);
+    strcpy(*dest, source);
+}
+
 unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char const* optionl_value) {
     unsigned int num_args_processed = 1;
     switch (flag) {
@@ -44,7 +50,7 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
             arguments->line_strict_match = true;
             break;
         case REGEX_PRESENT_FLAG:
-            arguments->regex_pattern = optionl_value;
+            alloc_str_and_copy(&arguments->regex_pattern, optionl_value);
             num_args_processed++;
             break;
         default:
@@ -59,7 +65,7 @@ int process_arg(char const* curr_arg, char const* optional_value, arguments_t* a
     if (ARG_IS_FLAG(curr_arg)) {
         return args_parser_update_flags(arguments, ARG_GET_FLAG(curr_arg), optional_value);
     } else {
-        arguments->search_pattern = curr_arg;
+        alloc_str_and_copy(&arguments->search_pattern, curr_arg);
         return 1;
     }
 }
@@ -69,7 +75,7 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
         process_arg(last_arg, NULL, arguments);
     } else {
         if (arguments->regex_pattern == NULL && arguments->search_pattern == NULL) {
-            arguments->search_pattern = last_arg;
+            alloc_str_and_copy(&arguments->search_pattern, last_arg);
         } else {
             arguments->input_filename = last_arg;
         }
@@ -78,10 +84,10 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
 
 /* public functions */
 void lowercase_string(char const* original_string, char* lowercased_string) {
-    for (int i = 0; i < strlen(original_string); i++){
+    for (unsigned int i = 0; i < strlen(original_string); i++){
         lowercased_string[i] = tolower(original_string[i]);
     }
-    lowercased_string[strlen(lowercased_string)] = '\0';
+    lowercased_string[strlen(original_string)] = '\0';
 }
 
 void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
@@ -114,4 +120,13 @@ void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     }
 
     assert(arguments->regex_pattern != NULL || arguments->search_pattern != NULL);
+}
+
+void free_args_internals(arguments_t* arguments) {
+    if (arguments->search_pattern != NULL) {
+        free(arguments->search_pattern);
+    }
+    if (arguments->regex_pattern != NULL) {
+        free(arguments->regex_pattern);
+    }
 }
