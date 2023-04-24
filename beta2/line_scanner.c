@@ -6,7 +6,7 @@
 #include <assert.h>
 
 
-bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
+bool is_match_in_line(input_line_t* line, arguments_t* arguments, regex_t* regex) {
     bool is_match = false;
     char* line_to_check = line->line_buffer;
     char* lowercase_string_buffer = NULL;
@@ -19,7 +19,7 @@ bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
     }
 
     if (arguments->regex_pattern != NULL) {
-        is_match = is_regex_match_in_line(line_to_check, arguments->regex_pattern);
+        is_match = is_regex_match_in_line(regex, line_to_check);
     }
     else if (arguments->line_strict_match) {
         is_match = strcmp(line_to_check, arguments->search_pattern) == 0;
@@ -35,9 +35,10 @@ bool is_match_in_line(input_line_t* line, arguments_t* arguments) {
            (!is_match && arguments->print_non_match);
 }
 
-bool should_print_line(arguments_t* arguments, bool has_found_match_yet, unsigned int current_line_num, unsigned int last_matched_line_num) {
+bool should_print_line(arguments_t* arguments, input_scanner_t* input_scanner, unsigned int current_line_num) {
     return !arguments->print_count_lines &&
-           (has_found_match_yet && current_line_num - last_matched_line_num <= arguments->num_lines_after_match);
+           input_scanner->has_found_match_yet && 
+           current_line_num - input_scanner->last_matched_line_num <= arguments->num_lines_after_match;
 }
 
 int read_line(input_scanner_t* input_scanner, input_line_t* line) {

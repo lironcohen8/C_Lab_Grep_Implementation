@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "input_scanner.h"
 #include "line_scanner.h"
 
@@ -17,36 +18,48 @@ FILE* get_input_stream(char const* input_filename) {
     }
 }
 
-void scan_input(arguments_t* arguments) {
-    input_scanner_t input_scanner = {.current_offset = 0, .input_stream = NULL, .buff_len = 0};
-    input_scanner.input_stream = get_input_stream(arguments->input_filename);
+void init_input_scanner(input_scanner_t* input_scanner, arguments_t* arguments) {
+    input_scanner->current_offset = 0;
+    input_scanner->input_stream = get_input_stream(arguments->input_filename);
+    input_scanner->buff_len = 0;
+    if (arguments->regex_pattern != NULL) {
+        compile_regex(arguments->regex_pattern, &input_scanner->regex);
+    } else {
+        memset(&input_scanner->regex, 0x00, sizeof(regex_t));
+    }
+    input_scanner->has_found_match_yet = false;
+    input_scanner->number_of_matched_lines = 0;
+    input_scanner->last_matched_line_num = 0;
+}
+
+void scan_input(input_scanner_t* input_scanner, arguments_t* arguments) {
     input_line_t current_line = {.is_match = false, .line_buffer=NULL, .offset=0};
     unsigned int current_line_num = 1;
-    bool has_found_match_yet = false; // This variable is for preventing false positive print matches
-    unsigned int last_matched_line_num = 0;
-    unsigned int number_of_matched_lines = 0;
 
-    while ((read_line(&input_scanner, &current_line)) != -1) {
-        current_line.is_match = is_match_in_line(&current_line, arguments);
+    while ((read_line(input_scanner, &current_line)) != -1) {
+        current_line.is_match = is_match_in_line(&current_line, arguments, &input_scanner->regex);
         if (current_line.is_match) {
-            has_found_match_yet = true;
-            last_matched_line_num = current_line_num;
-            number_of_matched_lines++;
+            input_scanner->has_found_match_yet = true;
+            input_scanner->last_matched_line_num = current_line_num;
+            input_scanner->number_of_matched_lines++;
         }
-        if (should_print_line(arguments, has_found_match_yet, current_line_num, last_matched_line_num)) {
+        if (should_print_line(arguments, input_scanner, current_line_num)) {
             print_line(&current_line, arguments, current_line_num);
         }
         current_line_num++;
     }
 
     if (arguments->print_count_lines) {
-        printf("%d\n", number_of_matched_lines);
+        printf("%d\n", input_scanner->number_of_matched_lines);
     }
-
     if (current_line.line_buffer != NULL) {
         free(current_line.line_buffer);
     }
     if (arguments->input_filename != NULL) {
-        fclose(input_scanner.input_stream);
+        fclose(input_scanner->input_stream);
     }
+}
+
+void free_input_scanner_internals(input_scanner_t* input_scanner) {
+    free_regex(&input_scanner->regex);
 }
