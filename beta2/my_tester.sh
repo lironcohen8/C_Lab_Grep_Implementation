@@ -2,9 +2,10 @@
 
 PROG_NAME=my_grep
 GREP_PROGRAM=grep
+TESTS_OUTPUT_DIR=test_results
 
 execute_test() {
-    OUTFILE="test"$2.out
+    OUTFILE=./$TESTS_OUTPUT_DIR/"test$2.out"
     echo "Running test"$2
     $GREP_PROGRAM $1 > $OUTFILE
 
@@ -13,6 +14,9 @@ execute_test() {
     valgrind --quiet --leak-check=yes --track-origins=yes "./$PROG_NAME" $1 | diff $OUTFILE -
     echo "test$2 completed"
 }
+
+rm -rf ./$TESTS_OUTPUT_DIR
+mkdir ./$TESTS_OUTPUT_DIR
 
 execute_test "arg -n -b main.c" 1
 execute_test "er.h main.c" 2
