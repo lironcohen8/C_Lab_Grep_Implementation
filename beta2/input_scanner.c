@@ -23,27 +23,31 @@ void init_input_scanner(input_scanner_t* input_scanner, arguments_t* arguments) 
     input_scanner->input_stream = get_input_stream(arguments->input_filename);
     input_scanner->buff_len = 0;
     compile_regex(arguments->search_pattern, &input_scanner->regex);
-    input_scanner->has_found_match_yet = false;
+    input_scanner->found_match_yet = false;
     input_scanner->number_of_matched_lines = 0;
     input_scanner->last_matched_line_num = 0;
 }
 
 void scan_input(input_scanner_t* input_scanner, arguments_t* arguments) {
-    input_line_t current_line = {.is_match = false, .line_buffer=NULL, .offset=0};
-    unsigned int current_line_num = 1;
+    input_line_t current_line = {.is_match = false, .line_buffer=NULL, .offset=0, .line_num = 1};
+    bool prev_line_printed = false;
 
     while ((read_line(input_scanner, &current_line)) != -1) {
         current_line.is_match = is_match_in_line(&current_line, arguments, &input_scanner->regex);
+        if (arguments->seperator_requiered) {
+            current_line.include_seperator = should_include_seperator(prev_line_printed,
+                                                                   current_line.is_match,
+                                                                   input_scanner->found_match_yet);
+        }
         if (current_line.is_match) {
-            input_scanner->has_found_match_yet = true;
-            input_scanner->last_matched_line_num = current_line_num;
+            input_scanner->found_match_yet = true;
+            input_scanner->last_matched_line_num = current_line.line_num;
             input_scanner->number_of_matched_lines++;
         }
-        if (should_print_line(arguments, input_scanner, current_line_num)) {
-            print_line(&current_line, arguments, current_line_num);
+        if ((prev_line_printed=should_print_line(arguments, input_scanner, &current_line))) {
+            print_line(&current_line, arguments);
         }
-        
-        current_line_num++;
+        current_line.line_num++;
     }
 
     if (arguments->print_count_lines) {

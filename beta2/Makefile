@@ -24,7 +24,7 @@ clean:
 	-rm *.o $(PROGRAM)
 
 test:
-	$(GREP_TESTS_FOLDER)/beta2.sh
+	@$(GREP_TESTS_FOLDER)/beta2.sh
 
 our_test:
 	./my_tester.sh

@@ -29,6 +29,7 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
     switch (flag) {
         case LINES_AFTER_MATCH_FLAG:
             arguments->num_lines_after_match = atoi(optionl_value);
+            arguments->seperator_requiered = true;
             num_args_processed++;
             break;
         case LINE_OFFSET_FLAG:

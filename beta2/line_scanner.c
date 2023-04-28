@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define SEPERATOR_LINE "--\n"
 
 bool is_match_in_line(input_line_t* line, arguments_t* arguments, regex_t* regex) {
     bool is_match = false;
@@ -27,10 +28,14 @@ bool is_match_in_line(input_line_t* line, arguments_t* arguments, regex_t* regex
            (!is_match && arguments->print_non_match);
 }
 
-bool should_print_line(arguments_t* arguments, input_scanner_t* input_scanner, unsigned int current_line_num) {
+bool should_print_line(arguments_t* arguments, input_scanner_t* input_scanner, input_line_t* line) {
     return !arguments->print_count_lines &&
-           input_scanner->has_found_match_yet && 
-           current_line_num - input_scanner->last_matched_line_num <= arguments->num_lines_after_match;
+            input_scanner->found_match_yet && 
+            line->line_num - input_scanner->last_matched_line_num <= arguments->num_lines_after_match;
+}
+
+bool should_include_seperator(bool prev_line_printed, bool current_line_match, bool found_match_yet) {
+    return !prev_line_printed && current_line_match && found_match_yet;
 }
 
 int read_line(input_scanner_t* input_scanner, input_line_t* line) {
@@ -47,9 +52,12 @@ int read_line(input_scanner_t* input_scanner, input_line_t* line) {
     return res;
 }
 
-void print_line(input_line_t* line, arguments_t* arguments, unsigned int line_number){
+void print_line(input_line_t* line, arguments_t* arguments){
+    if (line->include_seperator) {
+        printf(SEPERATOR_LINE);
+    }
     if (arguments->print_line_number) {
-        printf("%u%s", line_number, line->is_match ? ":" : "-");
+        printf("%u%s", line->line_num, line->is_match ? ":" : "-");
     }
     if (arguments->print_line_offset) {
         printf("%u%s", line->offset, line->is_match ? ":" : "-");

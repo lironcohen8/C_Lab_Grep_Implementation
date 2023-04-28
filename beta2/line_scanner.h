@@ -7,14 +7,17 @@
 #include "input_scanner.h"
 
 typedef struct _input_line_t {
-    char* line_buffer;
-    unsigned int offset;
-    bool is_match;
+    char*         line_buffer;
+    unsigned int  offset;
+    bool          is_match;
+    unsigned int  line_num;
+    bool          include_seperator;
 } input_line_t;
 
 bool is_match_in_line(input_line_t* line, arguments_t* arguments, regex_t* regex);
-bool should_print_line(arguments_t* arguments, input_scanner_t* input_scanner, unsigned int current_line_num);
+bool should_print_line(arguments_t* arguments, input_scanner_t* input_scanner, input_line_t* line);
 int read_line(input_scanner_t* input_scanner, input_line_t* line);
-void print_line(input_line_t* line, arguments_t* arguments, unsigned int line_number);
+void print_line(input_line_t* line, arguments_t* arguments);
+bool should_include_seperator(bool prev_line_printed, bool current_line_match, bool found_match_yet);
 
 #endif

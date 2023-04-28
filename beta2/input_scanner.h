@@ -10,7 +10,7 @@ typedef struct {
     unsigned int  current_offset;
     size_t        buff_len;
     regex_t       regex;
-    bool          has_found_match_yet;
+    bool          found_match_yet;
     unsigned int  number_of_matched_lines;
     unsigned int  last_matched_line_num;
 } input_scanner_t;

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 typedef struct _arguments_t {
+    bool         seperator_requiered;
     unsigned int num_lines_after_match;
     bool         print_line_offset;
     bool         print_count_lines;
