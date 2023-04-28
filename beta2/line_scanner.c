@@ -12,21 +12,13 @@ bool is_match_in_line(input_line_t* line, arguments_t* arguments, regex_t* regex
     char* lowercase_string_buffer = NULL;
 
     if (arguments->ignore_case) {
-        lowercase_string_buffer = (char *) malloc (strlen(line->line_buffer) + 1);
+        lowercase_string_buffer = (char*)malloc(strlen(line->line_buffer) + 1);
         assert (lowercase_string_buffer != NULL);
         lowercase_string(line->line_buffer, lowercase_string_buffer);
         line_to_check = lowercase_string_buffer;
     }
 
-    if (arguments->regex_pattern != NULL) {
-        is_match = is_regex_match_in_line(regex, line_to_check);
-    }
-    else if (arguments->line_strict_match) {
-        is_match = strcmp(line_to_check, arguments->search_pattern) == 0;
-    }
-    else {
-        is_match = strstr(line_to_check, arguments->search_pattern) != NULL;
-    }
+    is_match = is_regex_match_in_line(regex, line_to_check, arguments->line_strict_match);
 
     if (lowercase_string_buffer != NULL) {
         free(lowercase_string_buffer);

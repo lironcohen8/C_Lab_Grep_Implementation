@@ -50,7 +50,7 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
             arguments->line_strict_match = true;
             break;
         case REGEX_PRESENT_FLAG:
-            alloc_str_and_copy(&arguments->regex_pattern, optionl_value);
+            alloc_str_and_copy(&arguments->search_pattern, optionl_value);
             num_args_processed++;
             break;
         default:
@@ -74,7 +74,7 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
     if (ARG_IS_FLAG(last_arg)) {
         process_arg(last_arg, NULL, arguments);
     } else {
-        if (arguments->regex_pattern == NULL && arguments->search_pattern == NULL) {
+        if (arguments->search_pattern == NULL) {
             alloc_str_and_copy(&arguments->search_pattern, last_arg);
         } else {
             arguments->input_filename = last_arg;
@@ -100,33 +100,20 @@ void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
         curr_arg = argv[argv_index];
         optional_val = argv[argv_index+1];
         count_args_processed_in_iteration = process_arg(curr_arg, optional_val, arguments);
-        if (count_args_processed_in_iteration == 0) {
-            exit(EXIT_FAILURE);
-        }
+        assert(count_args_processed_in_iteration != 0);
          argv_index += count_args_processed_in_iteration;
     }
-
     if (argv_index == argc - 1) {
         process_last_arg(argv[argv_index], arguments);
     }
-
+    assert(arguments->search_pattern != NULL);
     if (arguments->ignore_case) {
-        if (arguments->search_pattern != NULL) {
-            lowercase_string(arguments->search_pattern, arguments->search_pattern);
-        }
-        if (arguments->regex_pattern != NULL) {
-            lowercase_string(arguments->regex_pattern, arguments->regex_pattern);
-        }
+        lowercase_string(arguments->search_pattern, arguments->search_pattern);
     }
-
-    assert(arguments->regex_pattern != NULL || arguments->search_pattern != NULL);
 }
 
 void free_args_internals(arguments_t* arguments) {
     if (arguments->search_pattern != NULL) {
         free(arguments->search_pattern);
-    }
-    if (arguments->regex_pattern != NULL) {
-        free(arguments->regex_pattern);
     }
 }

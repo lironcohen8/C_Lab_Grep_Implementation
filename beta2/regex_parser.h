@@ -28,7 +28,7 @@ typedef struct {
     regex_element_t* element_arr;
 } regex_t;
 
-bool is_regex_match_in_line(regex_t* regex, char* line);
+bool is_regex_match_in_line(regex_t* regex, char* line, bool is_strict);
 void compile_regex(char* pattern, regex_t* regex);
 void free_regex(regex_t* regex);
 

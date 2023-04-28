@@ -22,11 +22,7 @@ void init_input_scanner(input_scanner_t* input_scanner, arguments_t* arguments) 
     input_scanner->current_offset = 0;
     input_scanner->input_stream = get_input_stream(arguments->input_filename);
     input_scanner->buff_len = 0;
-    if (arguments->regex_pattern != NULL) {
-        compile_regex(arguments->regex_pattern, &input_scanner->regex);
-    } else {
-        memset(&input_scanner->regex, 0x00, sizeof(regex_t));
-    }
+    compile_regex(arguments->search_pattern, &input_scanner->regex);
     input_scanner->has_found_match_yet = false;
     input_scanner->number_of_matched_lines = 0;
     input_scanner->last_matched_line_num = 0;
@@ -46,6 +42,7 @@ void scan_input(input_scanner_t* input_scanner, arguments_t* arguments) {
         if (should_print_line(arguments, input_scanner, current_line_num)) {
             print_line(&current_line, arguments, current_line_num);
         }
+        
         current_line_num++;
     }
 

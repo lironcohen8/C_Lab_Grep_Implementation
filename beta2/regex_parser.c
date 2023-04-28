@@ -73,9 +73,12 @@ bool match_regex_from_base(char* str_to_match, regex_t* regex) {
     return true; 
 }
 
-bool is_regex_match_in_str(char* str_to_match, unsigned int str_len, regex_t* regex) {
+bool is_regex_match_in_str(char* str_to_match, unsigned int str_len, regex_t* regex, bool is_strict) {
     if (regex->len > str_len) {
         return false;
+    }
+    if (is_strict) {
+        return (regex->len == str_len) && match_regex_from_base(str_to_match, regex);
     }
     for (unsigned int i = 0; i <= str_len - regex->len; i++) {
         if (match_regex_from_base(str_to_match, regex)) {
@@ -86,8 +89,8 @@ bool is_regex_match_in_str(char* str_to_match, unsigned int str_len, regex_t* re
     return false;
 }
 
-bool is_regex_match_in_line(regex_t* regex, char* line) {
-    return is_regex_match_in_str(line, strlen(line), regex);
+bool is_regex_match_in_line(regex_t* regex, char* line, bool is_strict) {
+    return is_regex_match_in_str(line, strlen(line), regex, is_strict);
 }
 
 void free_regex(regex_t* regex) {
