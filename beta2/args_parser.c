@@ -1,9 +1,9 @@
 #include "args_parser.h"
+#include "string_utils.h"
 #include <stdlib.h>
-#include <string.h>
 #include <assert.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <string.h>
 
 #define LINES_AFTER_MATCH_FLAG 'A'
 #define LINE_OFFSET_FLAG       'b'
@@ -23,6 +23,7 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
     switch (flag) {
         case LINES_AFTER_MATCH_FLAG:
             arguments->num_lines_after_match = atoi(optionl_value);
+            arguments->separator_required = true;
             num_args_processed++;
             break;
         case LINE_OFFSET_FLAG:
@@ -44,7 +45,7 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
             arguments->line_strict_match = true;
             break;
         case REGEX_PRESENT_FLAG:
-            arguments->regex_pattern = optionl_value;
+            alloc_str_and_copy(&arguments->search_pattern, optionl_value);
             num_args_processed++;
             break;
         default:
@@ -59,7 +60,7 @@ int process_arg(char const* curr_arg, char const* optional_value, arguments_t* a
     if (ARG_IS_FLAG(curr_arg)) {
         return args_parser_update_flags(arguments, ARG_GET_FLAG(curr_arg), optional_value);
     } else {
-        arguments->search_pattern = curr_arg;
+        alloc_str_and_copy(&arguments->search_pattern, curr_arg);
         return 1;
     }
 }
@@ -68,8 +69,8 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
     if (ARG_IS_FLAG(last_arg)) {
         process_arg(last_arg, NULL, arguments);
     } else {
-        if (arguments->regex_pattern == NULL && arguments->search_pattern == NULL) {
-            arguments->search_pattern = last_arg;
+        if (arguments->search_pattern == NULL) {
+            alloc_str_and_copy(&arguments->search_pattern, last_arg);
         } else {
             arguments->input_filename = last_arg;
         }
@@ -77,13 +78,6 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
 }
 
 /* public functions */
-void lowercase_string(char const* original_string, char* lowercased_string) {
-    for (int i = 0; i < strlen(original_string); i++){
-        lowercased_string[i] = tolower(original_string[i]);
-    }
-    lowercased_string[strlen(lowercased_string)] = '\0';
-}
-
 void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     memset(arguments, 0x00, sizeof(arguments_t));
     char const* curr_arg = NULL, *optional_val = NULL;
@@ -94,24 +88,20 @@ void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
         curr_arg = argv[argv_index];
         optional_val = argv[argv_index+1];
         count_args_processed_in_iteration = process_arg(curr_arg, optional_val, arguments);
-        if (count_args_processed_in_iteration == 0) {
-            exit(EXIT_FAILURE);
-        }
+        assert(count_args_processed_in_iteration != 0);
          argv_index += count_args_processed_in_iteration;
     }
-
     if (argv_index == argc - 1) {
         process_last_arg(argv[argv_index], arguments);
     }
-
+    assert(arguments->search_pattern != NULL);
     if (arguments->ignore_case) {
-        if (arguments->search_pattern != NULL) {
-            lowercase_string(arguments->search_pattern, arguments->search_pattern);
-        }
-        if (arguments->regex_pattern != NULL) {
-            lowercase_string(arguments->regex_pattern, arguments->regex_pattern);
-        }
+        lowercase_string(arguments->search_pattern, arguments->search_pattern);
     }
+}
 
-    assert(arguments->regex_pattern != NULL || arguments->search_pattern != NULL);
+void free_args_internals(arguments_t* arguments) {
+    if (arguments->search_pattern != NULL) {
+        free(arguments->search_pattern);
+    }
 }
