@@ -62,4 +62,3 @@ void print_line(input_line_t* line, arguments_t* arguments){
     }
     printf("%s\n", line->line_buffer);
 }
-

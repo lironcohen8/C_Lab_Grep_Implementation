@@ -37,8 +37,8 @@ void scan_input(input_scanner_t* input_scanner, arguments_t* arguments) {
         current_line.is_match = is_match_in_line(&current_line, arguments, &input_scanner->regex);
         if (arguments->separator_required) {
             current_line.include_seperator = should_include_separator(prev_line_printed,
-                                                                   current_line.is_match,
-                                                                   input_scanner->found_match_yet);
+                current_line.is_match,
+                input_scanner->found_match_yet);
         }
         if (current_line.is_match) {
             input_scanner->found_match_yet = true;

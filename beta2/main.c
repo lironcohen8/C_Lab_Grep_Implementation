@@ -1,8 +1,7 @@
 #include "args_parser.h"
 #include "input_scanner.h"
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
     arguments_t args;
     input_scanner_t input_scanner;
 

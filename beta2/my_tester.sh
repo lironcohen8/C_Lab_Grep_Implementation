@@ -53,6 +53,3 @@ NUMBER_TEST_FILE=./$TESTS_OUTPUT_DIR/test_number_file.txt
 python3 -c 'for i in range(300):print(f"[{i}]")' > $NUMBER_TEST_FILE
 
 execute_test "7 -A 2 $NUMBER_TEST_FILE"
-
-# regex tests
-# ./regex_test1.sh

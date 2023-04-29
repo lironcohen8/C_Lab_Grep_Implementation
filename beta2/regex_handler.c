@@ -46,6 +46,17 @@ bool match_regex_element(char* str_to_match, regex_element_t* regex_element) {
     return false;
 }
 
+bool match_regex_from_base(char* str_to_match, regex_t* regex) {
+    for (unsigned int i = 0; i < regex->len; i++) {
+        if (!match_regex_element(str_to_match, &regex->element_arr[i])) {
+            return false;
+        }
+        str_to_match++;
+    }
+    return true; 
+}
+
+/* public functions */
 void compile_regex(char* pattern, regex_t* regex) {
     unsigned int pattern_length = strlen(pattern);
     regex->element_arr = (regex_element_t*) malloc(pattern_length * sizeof(regex_element_t));
@@ -63,17 +74,6 @@ void compile_regex(char* pattern, regex_t* regex) {
     regex->len = current_elemnet_idx;
 }
 
-bool match_regex_from_base(char* str_to_match, regex_t* regex) {
-    for (unsigned int i = 0; i < regex->len; i++) {
-        if (!match_regex_element(str_to_match, &regex->element_arr[i])) {
-            return false;
-        }
-        str_to_match++;
-    }
-    return true; 
-}
-
-/* public functions */
 bool is_regex_match_in_line(char* line, unsigned int str_len, regex_t* regex, bool is_strict) {
     if (regex->len > str_len) {
         return false;

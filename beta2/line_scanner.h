@@ -2,7 +2,6 @@
 #define LINE_SCANNER_H
 
 #include <stdbool.h>
-#include <stdio.h>
 #include "args_parser.h"
 #include "input_scanner.h"
 
