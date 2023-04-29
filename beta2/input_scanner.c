@@ -34,8 +34,8 @@ void scan_input(input_scanner_t* input_scanner, arguments_t* arguments) {
 
     while ((read_line(input_scanner, &current_line)) != -1) {
         current_line.is_match = is_match_in_line(&current_line, arguments, &input_scanner->regex);
-        if (arguments->seperator_requiered) {
-            current_line.include_seperator = should_include_seperator(prev_line_printed,
+        if (arguments->separator_required) {
+            current_line.include_seperator = should_include_separator(prev_line_printed,
                                                                    current_line.is_match,
                                                                    input_scanner->found_match_yet);
         }
