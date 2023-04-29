@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include "args_parser.h"
-#include "regex_parser.h"
+#include "regex_handler.h"
 
 typedef struct {
     FILE*         input_stream;

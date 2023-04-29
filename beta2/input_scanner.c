@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "input_scanner.h"
 #include "line_scanner.h"
 
+/* private functions */
 FILE* get_input_stream(char const* input_filename) {
     if (input_filename == NULL) {
         return stdin;
@@ -18,6 +18,7 @@ FILE* get_input_stream(char const* input_filename) {
     }
 }
 
+/* public functions */
 void init_input_scanner(input_scanner_t* input_scanner, arguments_t* arguments) {
     input_scanner->current_offset = 0;
     input_scanner->input_stream = get_input_stream(arguments->input_filename);

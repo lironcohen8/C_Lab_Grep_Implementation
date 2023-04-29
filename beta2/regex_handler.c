@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "regex_parser.h"
+#include "regex_handler.h"
 #include "assert.h"
 
 #define REGEX_ESCAPING_CHAR    '\\'
@@ -51,16 +51,16 @@ void compile_regex(char* pattern, regex_t* regex) {
     regex->element_arr = (regex_element_t*) malloc(pattern_length * sizeof(regex_element_t));
     assert(regex->element_arr != NULL);
     unsigned int chars_processed = 0, chars_processed_in_iteration = 0;
-    unsigned int current_elemnt_index = 0;
+    unsigned int current_elemnet_idx = 0;
     while (chars_processed < pattern_length) {
-        chars_processed_in_iteration = process_regex_element(pattern, &regex->element_arr[current_elemnt_index]);
+        chars_processed_in_iteration = process_regex_element(pattern, &regex->element_arr[current_elemnet_idx]);
         chars_processed += chars_processed_in_iteration;
         pattern += chars_processed_in_iteration;
-        current_elemnt_index++;
+        current_elemnet_idx++;
     }
-    regex->element_arr = (regex_element_t*)realloc(regex->element_arr, (current_elemnt_index) * sizeof(regex_element_t));
+    regex->element_arr = (regex_element_t*)realloc(regex->element_arr, (current_elemnet_idx) * sizeof(regex_element_t));
     assert(regex->element_arr != NULL);
-    regex->len = current_elemnt_index;
+    regex->len = current_elemnet_idx;
 }
 
 bool match_regex_from_base(char* str_to_match, regex_t* regex) {
@@ -73,6 +73,7 @@ bool match_regex_from_base(char* str_to_match, regex_t* regex) {
     return true; 
 }
 
+/* public functions */
 bool is_regex_match_in_line(char* line, unsigned int str_len, regex_t* regex, bool is_strict) {
     if (regex->len > str_len) {
         return false;

@@ -1,9 +1,9 @@
 #include "args_parser.h"
+#include "string_utils.h"
 #include <stdlib.h>
-#include <string.h>
 #include <assert.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <string.h>
 
 #define LINES_AFTER_MATCH_FLAG 'A'
 #define LINE_OFFSET_FLAG       'b'
@@ -18,12 +18,6 @@
 #define ARG_GET_FLAG(arg)     (arg[1])
 
 /* private functions */
-void alloc_str_and_copy(char** dest, char const* source) {
-    *dest = (char*) malloc(strlen(source) + 1);
-    assert(*dest != NULL);
-    strcpy(*dest, source);
-}
-
 unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char const* optionl_value) {
     unsigned int num_args_processed = 1;
     switch (flag) {
@@ -84,13 +78,6 @@ void process_last_arg(char const* last_arg, arguments_t* arguments) {
 }
 
 /* public functions */
-void lowercase_string(char const* original_string, char* lowercased_string) {
-    for (unsigned int i = 0; i < strlen(original_string); i++){
-        lowercased_string[i] = tolower(original_string[i]);
-    }
-    lowercased_string[strlen(original_string)] = '\0';
-}
-
 void parse_arguments(int argc, char const *argv[], arguments_t* arguments) {
     memset(arguments, 0x00, sizeof(arguments_t));
     char const* curr_arg = NULL, *optional_val = NULL;

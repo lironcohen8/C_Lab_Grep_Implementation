@@ -1,9 +1,10 @@
 #include "line_scanner.h"
 #include "args_parser.h"
-#include "regex_parser.h"
-#include <string.h>
+#include "regex_handler.h"
+#include "string_utils.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 #define SEPARATOR_LINE "--\n"
 
@@ -44,10 +45,7 @@ int read_line(input_scanner_t* input_scanner, input_line_t* line) {
     res = getline(&line->line_buffer, &input_scanner->buff_len, input_scanner->input_stream);
     if (res >= 0) {
         input_scanner->current_offset += res;
-        int line_length = strlen(line->line_buffer);
-        if (line_length > 0 && line->line_buffer[line_length - 1] == '\n') {
-            line->line_buffer[line_length - 1] = '\0';
-        }
+        remove_new_line_char(line->line_buffer);
     }
     return res;
 }
