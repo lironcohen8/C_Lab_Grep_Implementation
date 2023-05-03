@@ -1,15 +1,19 @@
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "regex_handler.h"
 #include "assert.h"
 
-#define REGEX_ESCAPING_CHAR    '\\'
-#define REGEX_DOT_CHAR         '.'
-#define REGEX_OPEN_RANGE_CHAR  '['
-#define REGEX_CLOSE_RANGE_CHAR ']'
+#define REGEX_ESCAPING_CHAR      '\\'
+#define REGEX_DOT_CHAR           '.'
+#define REGEX_OPEN_RANGE_CHAR    '['
+#define REGEX_CLOSE_RANGE_CHAR   ']'
 #define REGEX_OPEN_OPTIONS_CHAR  '('
 #define REGEX_CLOSE_OPTIONS_CHAR ')'
 #define REGEX_DELIM_OPTIONS_CHAR '|'
+#define NOT_MATCH_NUM             UINT_MAX
+
+bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained);
 
 /* private functions */
 unsigned int process_regex_element(char* pattern, regex_element_t* element) {
@@ -36,37 +40,55 @@ unsigned int process_regex_element(char* pattern, regex_element_t* element) {
     return chars_processed;
 }
 
-bool match_regex_element(char* str_to_match, regex_element_t* regex_element) {
+void match_regex_element(char* str_to_match, regex_element_t* regex_element, unsigned int num_matched_chars[REGEX_NUMBER_OF_STRING_OPTIONS]) {
     switch (regex_element->type) {
         case SIMPLE_CHAR:
-            return str_to_match[0] == regex_element->simple_char;
+            num_matched_chars[0] = (str_to_match[0] == regex_element->simple_char);
+            break;
         case DOT:
-            return true;
+            num_matched_chars[0] = 1;
+            break;
         case RANGE:
-            return str_to_match[0] >= regex_element->range.start &&
-                   str_to_match[0] <= regex_element->range.end;
+            num_matched_chars[0] = (str_to_match[0] >= regex_element->range.start &&
+                                    str_to_match[0] <= regex_element->range.end);
+            break;
         case OPTIONS:
-            return false;
-            //return match_regex_from_base(str_to_match, option1) | match_regex_from_base(str_to_match, option2);
+            for (int i = 0 ; i < REGEX_NUMBER_OF_STRING_OPTIONS ; i++) {
+                regex_t* option = &regex_element->options[i];
+                if (match_regex_from_base(str_to_match, option->element_arr, option->len)) {
+                    num_matched_chars[i] = option->len;
+                }
+            }
+            break;
     }
-    return false;
 }
 
-bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained) { // TODO MAYBE NOT NEEDED (add arg regex element and len, if not OPTIONS use regex->len else len of option)
+bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained) {
     if (elements_remained == 0) {
         return true;
     }
-    if (*str_to_match == '\0') {
+    unsigned int num_matched_chars[REGEX_NUMBER_OF_STRING_OPTIONS] = {NOT_MATCH_NUM,NOT_MATCH_NUM};
+    match_regex_element(str_to_match, regex_element, num_matched_chars);
+
+    if (regex_element->type != OPTIONS && num_matched_chars[0] == 0) {
         return false;
     }
-    int num_of_char_matched = match_regex_element(str_to_match, regex_element);
-    if (num_of_char_matched == 0) {
+
+    if (regex_element->type == OPTIONS && num_matched_chars[0] == NOT_MATCH_NUM && num_matched_chars[1] == NOT_MATCH_NUM) {
         return false;
     }
-    str_to_match += num_of_char_matched;
+
     regex_element++;
     elements_remained--;
-    return match_regex_from_base(str_to_match, regex_element, elements_remained); 
+    bool match_result[REGEX_NUMBER_OF_STRING_OPTIONS] = {false,false};
+
+    for (int i = 0; i < REGEX_NUMBER_OF_STRING_OPTIONS; i++) {
+        if (num_matched_chars[i] != NOT_MATCH_NUM && num_matched_chars[i] < strlen(str_to_match)) {
+            match_result[i] = match_regex_from_base(str_to_match+num_matched_chars[i], regex_element, elements_remained);
+        }
+    }
+
+    return match_result[0] || match_result[1];
 }
 
 /* public functions */

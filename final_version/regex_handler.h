@@ -4,6 +4,8 @@
 
 #include <stdbool.h>
 
+typedef struct regex_element_t regex_element_t;
+
 typedef enum {
     SIMPLE_CHAR,
     RANGE,
@@ -16,23 +18,19 @@ typedef struct {
     char end;
 } regex_range_t;
 
-typedef struct {
-    regex_type_e type;
-    union {
-        char                   simple_char;
-        regex_range_t          range;
-        regex_string_options_t options;
-    };
-} regex_element_t;
-
-typedef struct {
-    unsigned int len;
-    regex_element_t* element_arr;
+typedef struct regex_t {
+    unsigned int len; 
+    regex_element_t* element_arr; 
 } regex_t;
 
-typedef struct {
-    regex_t options[REGEX_NUMBER_OF_STRING_OPTIONS];
-} regex_string_options_t;
+struct regex_element_t {
+    regex_type_e type;
+    union {
+        char             simple_char;
+        regex_range_t    range;
+        regex_t          options[REGEX_NUMBER_OF_STRING_OPTIONS];
+    };
+};
 
 bool is_regex_match_in_line(char* line, unsigned int str_len, regex_t* regex, bool is_strict);
 void compile_regex(char* pattern, regex_t* regex);
