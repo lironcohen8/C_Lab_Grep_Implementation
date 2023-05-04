@@ -2,6 +2,7 @@
 #include <string.h>
 #include <limits.h>
 #include "regex_handler.h"
+#include "string_utils.h"
 #include "assert.h"
 
 #define REGEX_ESCAPING_CHAR      '\\'
@@ -11,6 +12,7 @@
 #define REGEX_OPEN_OPTIONS_CHAR  '('
 #define REGEX_CLOSE_OPTIONS_CHAR ')'
 #define REGEX_DELIM_OPTIONS_CHAR '|'
+#define NUMBER_OF_OPTIONS_CHARS   3
 #define NOT_MATCH_NUM             UINT_MAX
 
 bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained);
@@ -18,6 +20,7 @@ bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, i
 /* private functions */
 unsigned int process_regex_element(char* pattern, regex_element_t* element) {
     unsigned int chars_processed = 0;
+    unsigned int indexes_arr[NUMBER_OF_OPTIONS_CHARS] = {NOT_MATCH_NUM, NOT_MATCH_NUM, NOT_MATCH_NUM};
     if (pattern[0] == REGEX_ESCAPING_CHAR) {
         element->type = SIMPLE_CHAR;
         element->simple_char = pattern[1];
@@ -30,8 +33,20 @@ unsigned int process_regex_element(char* pattern, regex_element_t* element) {
         element->range.start = pattern[1];
         element->range.end = pattern[3];
         chars_processed = 5;
-        // TODO parse into regex options using string utils function that finds the index of the (,|,), calculate length, and mallocs options, and insert data to fields
-        // TODO chars processed number of chars between ( and ) inclusive
+    } else if (are_option_chars_indexes_found(pattern, indexes_arr)) {
+        element->type = OPTIONS;
+        for (int i = 0 ; i < REGEX_NUMBER_OF_STRING_OPTIONS ; i++) {
+            int option_len = indexes_arr[i+1] - indexes_arr[i];
+            regex_t* option = (regex_t*) malloc (option_len * sizeof(regex_t));
+            assert(option != NULL);
+            option->len = option_len;
+            for (int j = 0; j < option_len ; j++) {
+                option->element_arr[j].simple_char = pattern[indexes_arr[i]+j];
+                option->element_arr[j].type = SIMPLE_CHAR;
+            }
+            element->options[i] = *option;
+        }
+        chars_processed = indexes_arr[NUMBER_OF_OPTIONS_CHARS-1] - indexes_arr[0];
     } else {
         element->type = SIMPLE_CHAR;
         element->simple_char = pattern[0];
@@ -94,7 +109,7 @@ bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, i
 /* public functions */
 void compile_regex(char* pattern, regex_t* regex) {
     unsigned int pattern_length = strlen(pattern);
-    regex->element_arr = (regex_element_t*) malloc(pattern_length * sizeof(regex_element_t));
+    regex->element_arr = (regex_element_t*) malloc (pattern_length * sizeof(regex_element_t));
     assert(regex->element_arr != NULL);
     unsigned int chars_processed = 0, chars_processed_in_iteration = 0;
     unsigned int current_elemnet_idx = 0;
@@ -126,7 +141,14 @@ bool is_regex_match_in_line(char* line, unsigned int str_len, regex_t* regex, bo
 }
 
 void free_regex(regex_t* regex) {
+    for (unsigned int i = 0; i < regex->len; i++) {
+        if (regex->element_arr[i].type == OPTIONS) {
+            for (int j = 0; j < REGEX_NUMBER_OF_STRING_OPTIONS; j++) {
+                free_regex(&regex->element_arr[i].options[j]);
+            }
+        }
+    }
     if (regex->element_arr != NULL) {
-        free(regex->element_arr); // TODO free options
+        free(regex->element_arr);
     }
 }
