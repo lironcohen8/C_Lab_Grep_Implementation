@@ -33,7 +33,7 @@ struct regex_element_t {
 };
 
 bool is_regex_match_in_line(char* line, unsigned int str_len, regex_t* regex, bool is_strict);
-void compile_regex(char* pattern, regex_t* regex);
+void compile_regex(char* pattern, unsigned int pattern_len, regex_t* regex);
 void free_regex(regex_t* regex);
 
 #endif

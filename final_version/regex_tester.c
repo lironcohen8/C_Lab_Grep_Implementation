@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
     // argv[1] is string
     // argv[2] is pattern
     regex_t regex;
-    compile_regex(argv[2], &regex);
+    compile_regex(argv[2], strlen(argv[2]), &regex);
     printf("%u\n", is_regex_match_in_line(argv[1], strlen(argv[1]), &regex, false));
     return 0;
 }

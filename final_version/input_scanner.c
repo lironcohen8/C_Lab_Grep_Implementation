@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "input_scanner.h"
 #include "line_scanner.h"
 
@@ -23,7 +24,7 @@ void init_input_scanner(input_scanner_t* input_scanner, arguments_t* arguments) 
     input_scanner->current_offset = 0;
     input_scanner->input_stream = get_input_stream(arguments->input_filename);
     input_scanner->buff_len = 0;
-    compile_regex(arguments->search_pattern, &input_scanner->regex);
+    compile_regex(arguments->search_pattern, strlen(arguments->search_pattern), &input_scanner->regex);
     input_scanner->found_match_yet = false;
     input_scanner->number_of_matched_lines = 0;
     input_scanner->last_matched_line_num = 0;
