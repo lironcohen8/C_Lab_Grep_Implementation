@@ -19,7 +19,7 @@ typedef struct {
 } regex_range_t;
 
 typedef struct regex_t {
-    unsigned int len; 
+    unsigned int len;
     regex_element_t* element_arr; 
 } regex_t;
 

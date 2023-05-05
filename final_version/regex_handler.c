@@ -160,13 +160,15 @@ void compile_regex(char* pattern, unsigned int pattern_length, regex_t* regex) {
 }
 
 bool is_regex_match_in_line(char* line, unsigned int str_len, regex_t* regex, bool is_strict) {
-    if (min_num_chars_required_to_match(regex) > str_len) {
+    unsigned int min_num_chars_required = min_num_chars_required_to_match(regex);
+    if (min_num_chars_required > str_len) {
         return false;
     }
     if (is_strict) {
-        return (regex->len == str_len) && match_regex_from_base(line, regex->element_arr, regex->len);
+        // TODO the first condition is not correct for regex
+        return (min_num_chars_required == str_len) && match_regex_from_base(line, regex->element_arr, regex->len);
     }
-    for (unsigned int i = 0; i <= str_len - regex->len; i++) {
+    for (unsigned int i = 0; i <= str_len - min_num_chars_required; i++) {
         if (match_regex_from_base(line, regex->element_arr, regex->len)) {
             return true;
         }
