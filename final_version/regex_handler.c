@@ -98,8 +98,8 @@ bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, i
     bool match_result[REGEX_NUMBER_OF_STRING_OPTIONS] = {false,false};
 
     for (int i = 0; i < REGEX_NUMBER_OF_STRING_OPTIONS; i++) {
-        if (num_matched_chars[i] != NOT_MATCH_NUM && num_matched_chars[i] < strlen(str_to_match)) {
-            match_result[i] = match_regex_from_base(str_to_match+num_matched_chars[i], regex_element, elements_remained);
+        if (num_matched_chars[i] != NOT_MATCH_NUM && num_matched_chars[i] <= strlen(str_to_match)) {
+            match_result[i] = match_regex_from_base(str_to_match + num_matched_chars[i], regex_element, elements_remained);
         }
     }
 
