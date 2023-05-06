@@ -14,7 +14,7 @@
 #define REGEX_DELIM_OPTIONS_CHAR '|'
 #define NUMBER_OF_OPTIONS_CHARS   REGEX_NUMBER_OF_STRING_OPTIONS + 1
 
-bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained);
+bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained, unsigned int str_len, bool is_strict);
 
 /* private functions */
 unsigned int min_len_option(regex_element_t* element) {
@@ -83,7 +83,7 @@ unsigned int process_regex_element(char* pattern, regex_element_t* element) {
     return chars_processed;
 }
 
-void match_regex_element(char* str_to_match, regex_element_t* regex_element, unsigned int num_matched_chars[REGEX_NUMBER_OF_STRING_OPTIONS]) {
+void match_regex_element(char* str_to_match, regex_element_t* regex_element, unsigned int num_matched_chars[REGEX_NUMBER_OF_STRING_OPTIONS], bool is_strict) {
     switch (regex_element->type) {
         case SIMPLE_CHAR:
             num_matched_chars[0] = (str_to_match[0] == regex_element->simple_char);
@@ -98,7 +98,7 @@ void match_regex_element(char* str_to_match, regex_element_t* regex_element, uns
         case OPTIONS:
             for (int i = 0 ; i < REGEX_NUMBER_OF_STRING_OPTIONS ; i++) {
                 regex_t* option = &regex_element->options[i];
-                if (match_regex_from_base(str_to_match, option->element_arr, option->len)) {
+                if (match_regex_from_base(str_to_match, option->element_arr, option->len, option->len, is_strict)) {
                     num_matched_chars[i] = option->len;
                 }
             }
@@ -106,15 +106,12 @@ void match_regex_element(char* str_to_match, regex_element_t* regex_element, uns
     }
 }
 
-bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained) {
+bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained, unsigned int str_len, bool is_strict) {
     if (elements_remained == 0) {
-        return true;
-    }
-    if (*str_to_match == '\0' && regex_element->type != OPTIONS) {
-        return false;
+        return !is_strict || (is_strict && str_len == 0);
     }
     unsigned int num_matched_chars[REGEX_NUMBER_OF_STRING_OPTIONS] = {NO_MATCH, NO_MATCH};
-    match_regex_element(str_to_match, regex_element, num_matched_chars);
+    match_regex_element(str_to_match, regex_element, num_matched_chars, is_strict);
 
     if (regex_element->type != OPTIONS && num_matched_chars[0] == 0) {
         return false;
@@ -130,7 +127,7 @@ bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, i
 
     for (int i = 0; i < REGEX_NUMBER_OF_STRING_OPTIONS; i++) {
         if (num_matched_chars[i] != NO_MATCH && num_matched_chars[i] <= strlen(str_to_match)) {
-            match_result[i] = match_regex_from_base(str_to_match + num_matched_chars[i], regex_element, elements_remained);
+            match_result[i] = match_regex_from_base(str_to_match + num_matched_chars[i], regex_element, elements_remained, str_len - num_matched_chars[i], is_strict);
         }
     }
 
@@ -165,11 +162,10 @@ bool is_regex_match_in_line(char* line, unsigned int str_len, regex_t* regex, bo
         return false;
     }
     if (is_strict) {
-        // TODO the first condition is not correct for regex
-        return (min_num_chars_required == str_len) && match_regex_from_base(line, regex->element_arr, regex->len);
+        return match_regex_from_base(line, regex->element_arr, regex->len, str_len, is_strict);
     }
     for (unsigned int i = 0; i <= str_len - min_num_chars_required; i++) {
-        if (match_regex_from_base(line, regex->element_arr, regex->len)) {
+        if (match_regex_from_base(line, regex->element_arr, regex->len, str_len, is_strict)) {
             return true;
         }
         line++;
