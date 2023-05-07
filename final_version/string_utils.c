@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* public functions */
 void lowercase_string(char const* original_string, char* lowercased_string)
 {
   for (unsigned int i = 0; i < strlen(original_string); i++) {
@@ -28,7 +29,7 @@ void remove_new_line_char(char* line)
   }
 }
 
-unsigned int first_index_of_char(char* str, char char_to_look)
+unsigned int get_first_index_of_char(char* str, char char_to_look)
 {
   for (unsigned int i = 0; i < strlen(str); i++) {
     if (str[i] == char_to_look) {

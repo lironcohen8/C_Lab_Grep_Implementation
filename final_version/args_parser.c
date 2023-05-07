@@ -17,10 +17,10 @@
 #define ARG_IS_FLAG(arg) (arg[0] == '-')
 #define ARG_GET_FLAG(arg) (arg[1])
 
-#define VALUE_FILL_FOR_MEMSET 0x00
+#define INIT_VALUE_FOR_MEMSET 0x00
 
 /* private functions */
-unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char const* optionl_value)
+unsigned int update_args_flags(arguments_t* arguments, char flag, char const* optionl_value)
 {
   unsigned int num_args_processed = 1;
   switch (flag) {
@@ -62,7 +62,7 @@ unsigned int args_parser_update_flags(arguments_t* arguments, char flag, char co
 int process_arg(char const* curr_arg, char const* optional_value, arguments_t* arguments)
 {
   if (ARG_IS_FLAG(curr_arg)) {
-    return args_parser_update_flags(arguments, ARG_GET_FLAG(curr_arg), optional_value);
+    return update_args_flags(arguments, ARG_GET_FLAG(curr_arg), optional_value);
   } else {
     alloc_str_and_copy(&arguments->search_pattern, curr_arg);
     return 1;
@@ -85,7 +85,7 @@ void process_last_arg(char const* last_arg, arguments_t* arguments)
 /* public functions */
 void parse_arguments(int argc, char const* argv[], arguments_t* arguments)
 {
-  memset(arguments, VALUE_FILL_FOR_MEMSET, sizeof(arguments_t));
+  memset(arguments, INIT_VALUE_FOR_MEMSET, sizeof(arguments_t));
   char const *curr_arg = NULL, *optional_val = NULL;
   unsigned int count_args_processed_in_iteration = 0;
   int argv_index = 1;

@@ -8,6 +8,7 @@
 
 #define SEPARATOR_LINE "--\n"
 
+/* public functions */
 bool is_match_in_line(input_line_t* line, arguments_t* arguments, regex_t* regex)
 {
   bool is_match = false;
