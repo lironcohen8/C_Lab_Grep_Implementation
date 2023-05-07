@@ -1,16 +1,16 @@
 #ifndef LINE_SCANNER_H
 #define LINE_SCANNER_H
 
-#include <stdbool.h>
 #include "args_parser.h"
 #include "input_scanner.h"
+#include <stdbool.h>
 
 typedef struct _input_line_t {
-    char*         line_buffer;
-    unsigned int  offset;
-    bool          is_match;
-    unsigned int  line_num;
-    bool          include_seperator;
+  char* line_buffer;
+  unsigned int offset;
+  bool is_match;
+  unsigned int line_num;
+  bool include_seperator;
 } input_line_t;
 
 bool is_match_in_line(input_line_t* line, arguments_t* arguments, regex_t* regex);

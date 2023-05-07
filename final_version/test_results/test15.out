@@ -1,0 +1,9 @@
+2:#include "input_scanner.h"
+3:
+6:    input_scanner_t input_scanner;
+7:
+10:
+12:
+13:    free_input_scanner_internals(&input_scanner);
+15:    return 0;
+16:}

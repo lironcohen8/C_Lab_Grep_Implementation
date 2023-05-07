@@ -1,0 +1,16 @@
+1:#include "args_parser.h"
+2:#include "input_scanner.h"
+3:
+4:int main(int argc, char const *argv[]) {
+5:    arguments_t args;
+6:    input_scanner_t input_scanner;
+7:
+8:    parse_arguments(argc, argv, &args);
+9:    init_input_scanner(&input_scanner, &args);
+10:
+11:    scan_input(&input_scanner, &args);
+12:
+13:    free_input_scanner_internals(&input_scanner);
+14:    free_args_internals(&args);
+15:    return 0;
+16:}

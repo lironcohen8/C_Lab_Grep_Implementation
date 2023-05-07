@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#define NO_MATCH  UINT_MAX
+#define NO_MATCH UINT_MAX
 
 void lowercase_string(char const* original_string, char* lowercased_string);
 void alloc_str_and_copy(char** dest, char const* source);
