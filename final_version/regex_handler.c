@@ -36,11 +36,11 @@ unsigned int min_num_chars_required_to_match(regex_t* regex)
 {
   unsigned int total_min_len = 0;
   unsigned int element_min_len = 0;
-  for (unsigned int elemnt_idx = 0; elemnt_idx < regex->len; elemnt_idx++) {
-    if (regex->element_arr[elemnt_idx].type != OPTIONS) {
+  for (unsigned int element_idx = 0; element_idx < regex->len; element_idx++) {
+    if (regex->element_arr[element_idx].type != OPTIONS) {
       element_min_len = 1;
     } else {
-      element_min_len = min_len_option(&regex->element_arr[elemnt_idx]);
+      element_min_len = min_len_option(&regex->element_arr[element_idx]);
     }
     total_min_len += element_min_len;
   }
@@ -155,16 +155,16 @@ void compile_regex(char* pattern, unsigned int pattern_length, regex_t* regex)
     regex->element_arr = (regex_element_t*)malloc(pattern_length * sizeof(regex_element_t));
     assert(regex->element_arr != NULL);
     unsigned int chars_processed = 0, chars_processed_in_iteration = 0;
-    unsigned int current_elemnet_idx = 0;
+    unsigned int current_element_idx = 0;
     while (chars_processed < pattern_length) {
-      chars_processed_in_iteration = process_regex_element(pattern, &regex->element_arr[current_elemnet_idx]);
+      chars_processed_in_iteration = process_regex_element(pattern, &regex->element_arr[current_element_idx]);
       chars_processed += chars_processed_in_iteration;
       pattern += chars_processed_in_iteration;
-      current_elemnet_idx++;
+      current_element_idx++;
     }
-    regex->element_arr = (regex_element_t*)realloc(regex->element_arr, (current_elemnet_idx) * sizeof(regex_element_t));
+    regex->element_arr = (regex_element_t*)realloc(regex->element_arr, (current_element_idx) * sizeof(regex_element_t));
     assert(regex->element_arr != NULL);
-    regex->len = current_elemnet_idx;
+    regex->len = current_element_idx;
   } else {
     regex->element_arr = NULL;
     regex->len = 0;
