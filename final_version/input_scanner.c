@@ -35,20 +35,20 @@ void init_input_scanner(input_scanner_t* input_scanner, arguments_t* arguments)
 void scan_input(input_scanner_t* input_scanner, arguments_t* arguments)
 {
   input_line_t current_line = {.is_match = false, .line_buffer = NULL, .offset = 0, .line_num = 1};
-  bool prev_line_printed = false;
+  bool is_prev_line_printed = false;
 
   while ((read_line(input_scanner, &current_line)) != -1) {
     current_line.is_match = is_match_in_line(&current_line, arguments, &input_scanner->regex);
     if (arguments->separator_required) {
       current_line.include_seperator =
-          should_include_separator(prev_line_printed, current_line.is_match, input_scanner->found_match_yet);
+          should_include_separator(is_prev_line_printed, current_line.is_match, input_scanner->found_match_yet);
     }
     if (current_line.is_match) {
       input_scanner->found_match_yet = true;
       input_scanner->last_matched_line_num = current_line.line_num;
       input_scanner->number_of_matched_lines++;
     }
-    if ((prev_line_printed = should_print_line(arguments, input_scanner, &current_line))) {
+    if ((is_prev_line_printed = should_print_line(arguments, input_scanner, &current_line))) {
       print_line(&current_line, arguments);
     }
     current_line.line_num++;

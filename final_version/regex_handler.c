@@ -17,7 +17,7 @@
 #define REGEX_CLOSE_RANGE_CHAR_INDEX 4
 
 bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained,
-                           unsigned int str_len, bool is_strict);
+                           unsigned int str_len, bool num_chars_to_process);
 
 /* private functions */
 unsigned int calc_min_option_len(regex_element_t* element)
@@ -118,10 +118,10 @@ void match_regex_element(char* str_to_match, regex_element_t* regex_element,
 }
 
 bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained,
-                           unsigned int str_len, bool is_strict)
+                           unsigned int num_chars_to_process, bool is_strict)
 {
   if (elements_remained == 0) {
-    return !is_strict || (is_strict && str_len == 0);
+    return !is_strict || (is_strict && num_chars_to_process == 0);
   }
   unsigned int num_matched_chars[REGEX_NUMBER_OF_STRING_OPTIONS] = {NO_MATCH, NO_MATCH};
   match_regex_element(str_to_match, regex_element, num_matched_chars, is_strict);
@@ -141,7 +141,7 @@ bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, i
   for (int i = 0; i < REGEX_NUMBER_OF_STRING_OPTIONS; i++) {
     if (num_matched_chars[i] != NO_MATCH && num_matched_chars[i] <= strlen(str_to_match)) {
       match_result[i] = match_regex_from_base(str_to_match + num_matched_chars[i], regex_element, elements_remained,
-                                              str_len - num_matched_chars[i], is_strict);
+                                              num_chars_to_process - num_matched_chars[i], is_strict);
     }
   }
 
