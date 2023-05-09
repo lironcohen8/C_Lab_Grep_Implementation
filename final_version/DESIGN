@@ -2,4 +2,4 @@ args_parser - responsible for *parsing the arguments* of the program.
 input_scanner - responsible for *scanning the input* of the program.
 line_scanner - responsible for *scanning a single line* of the program's input.
 regex_handler - responsible for *handling* the *regex* functionality of the program.
-string_utils - contains some *string* related *utils* functions for he program.
+string_utils - contains some *string* related *utils* functions for the program.

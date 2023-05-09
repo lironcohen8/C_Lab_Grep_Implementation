@@ -17,7 +17,7 @@
 #define REGEX_CLOSE_RANGE_CHAR_INDEX 4
 
 bool match_regex_from_base(char* str_to_match, regex_element_t* regex_element, int elements_remained,
-                           unsigned int str_len, bool num_chars_to_process);
+                           unsigned int num_chars_to_process, bool is_strict);
 
 /* private functions */
 unsigned int calc_min_option_len(regex_element_t* element)
